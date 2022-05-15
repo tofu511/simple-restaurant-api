@@ -1,8 +1,8 @@
 use api_driver::controllers::item::{
     JsonItemAddingRequest, JsonItemAddlingResponse, JsonItemResponse,
 };
-use reqwest;
-use serde_json;
+
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

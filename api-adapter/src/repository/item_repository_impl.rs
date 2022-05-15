@@ -88,14 +88,14 @@ impl ItemRepository for ItemRepositoryImpl {
 #[cfg(test)]
 mod test {
     impl ItemRepositoryImpl {
-        async fn setup(&self) -> () {
+        async fn setup(&self) {
             sqlx::query!("INSERT INTO tables VALUES (), (), (), (), ()")
                 .execute(&self.db.pool)
                 .await
                 .unwrap();
         }
 
-        async fn tear_down(&self) -> () {
+        async fn tear_down(&self) {
             sqlx::query!("DELETE FROM tables")
                 .execute(&self.db.pool)
                 .await

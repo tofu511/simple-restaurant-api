@@ -14,7 +14,7 @@ pub struct Item {
 
 impl Item {
     pub fn new(name: String, quantity: u32, now: NaiveDateTime) -> Result<Self, String> {
-        if name.len() < 1 {
+        if name.is_empty() {
             return Err(String::from("name should not be empty"));
         }
         if quantity < 1 {

@@ -22,8 +22,8 @@ pub async fn query_item(
     let result = modules
         .item_usecase()
         .query_item(
-            params.get("table_number").unwrap().clone(),
-            params.get("item_id").unwrap().clone(),
+            *params.get("table_number").unwrap(),
+            *params.get("item_id").unwrap(),
         )
         .await;
     match result {
@@ -87,8 +87,8 @@ pub async fn delete_item(
     let result = modules
         .item_usecase()
         .delete_item(
-            params.get("table_number").unwrap().clone(),
-            params.get("item_id").unwrap().clone(),
+            *params.get("table_number").unwrap(),
+            *params.get("item_id").unwrap(),
         )
         .await;
     match result {
@@ -213,7 +213,7 @@ mod test {
 
         let response_text = get_items.text().await;
         let response_json: Vec<JsonItemResponse> = serde_json::from_str(&response_text).unwrap();
-        assert_eq!(response_json.len() > 0, true);
+        assert_eq!(!response_json.is_empty(), true);
     }
 
     #[tokio::test]
