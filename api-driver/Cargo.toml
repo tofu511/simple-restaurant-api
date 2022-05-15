@@ -1,0 +1,21 @@
+[package]
+name = "api-driver"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+api-core = { path = "../api-core" }
+api-usecase = { path = "../api-usecase" }
+api-adapter = { path = "../api-adapter" }
+axum = { version = "0.4.8" }
+axum-macros = "0.2.1"
+tokio = { version = "1.16.1", features = ["full"] }
+serde = { version = "1.0.133",  features = ["derive"] }
+serde_json = "1.0.79"
+chrono = "0.4.19"
+
+[dev-dependencies]
+pretty_assertions = "1.2.0"
+axum-test-helper = "0.1.0"
