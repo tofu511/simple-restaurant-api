@@ -3,5 +3,7 @@ members = [
 	"api-adapter",
 	"api-core",
 	"api-driver",
-	"api-usecase"
+	"api-usecase",
+	"app-client"
 ]
+# exclude = ["app-client"]

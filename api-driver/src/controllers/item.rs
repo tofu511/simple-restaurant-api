@@ -62,14 +62,20 @@ pub async fn add_item(
     Path(table_number): Path<u32>,
     Json(req): Json<JsonItemAddingRequest>,
     Extension(modules): Extension<ModulesImpl>,
-) -> impl IntoResponse {
+) -> Result<impl IntoResponse, StatusCode> {
     let maybe_item = Item::new(req.name, req.quantity, Local::now().naive_local());
     if maybe_item.is_err() {
         return Err(StatusCode::BAD_REQUEST);
     }
-    let result = modules.item_usecase().add_item(table_number, maybe_item.unwrap()).await;
+    let result = modules
+        .item_usecase()
+        .add_item(table_number, maybe_item.unwrap())
+        .await;
     match result {
-        Ok(_) => Ok(StatusCode::CREATED),
+        Ok(id) => Ok((
+            StatusCode::CREATED,
+            Json(JsonItemAddlingResponse { item_id: id }),
+        )),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
@@ -95,6 +101,11 @@ pub async fn delete_item(
 pub struct JsonItemAddingRequest {
     pub name: String,
     pub quantity: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct JsonItemAddlingResponse {
+    pub item_id: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -124,10 +135,10 @@ impl JsonItemResponse {
 #[cfg(test)]
 mod test {
     use super::*;
-    use pretty_assertions::assert_eq;
-    use crate::routes;
     use crate::modules::ModulesImpl;
+    use crate::routes;
     use axum_test_helper::TestClient;
+    use pretty_assertions::assert_eq;
 
     async fn test_client() -> TestClient {
         let test_app = routes::router(ModulesImpl::test().await).await;
@@ -137,8 +148,22 @@ mod test {
     #[tokio::test]
     async fn test_validation_error() {
         let client = test_client().await;
-        let empty_name = client.post("/tables/1/item").json(&JsonItemAddingRequest { name: "".to_string(), quantity: 1} ).send().await;
-        let empty_quantity = client.post("/tables/1/item").json(&JsonItemAddingRequest { name: "a".to_string(), quantity: 0} ).send().await;
+        let empty_name = client
+            .post("/tables/1/item")
+            .json(&JsonItemAddingRequest {
+                name: "".to_string(),
+                quantity: 1,
+            })
+            .send()
+            .await;
+        let empty_quantity = client
+            .post("/tables/1/item")
+            .json(&JsonItemAddingRequest {
+                name: "a".to_string(),
+                quantity: 0,
+            })
+            .send()
+            .await;
         assert_eq!(empty_name.status(), StatusCode::BAD_REQUEST);
         assert_eq!(empty_quantity.status(), StatusCode::BAD_REQUEST);
     }
@@ -146,26 +171,49 @@ mod test {
     #[tokio::test]
     async fn test_post_item() {
         let client = test_client().await;
-        let post_item = client.post("/tables/1/item").json(&JsonItemAddingRequest{ name: "Sushi".to_string(), quantity: 10}).send().await;
+        let post_item = client
+            .post("/tables/1/item")
+            .json(&JsonItemAddingRequest {
+                name: "Sushi".to_string(),
+                quantity: 10,
+            })
+            .send()
+            .await;
         assert_eq!(post_item.status(), StatusCode::CREATED);
     }
-
 
     #[tokio::test]
     async fn test_query_items() {
         let client = test_client().await;
-        client.post("/tables/1/item").json(&JsonItemAddingRequest{ name: "Sushi".to_string(), quantity: 10}).send().await;
+        let post_response = client
+            .post("/tables/1/item")
+            .json(&JsonItemAddingRequest {
+                name: "Sushi".to_string(),
+                quantity: 10,
+            })
+            .send()
+            .await;
+
+        let response_text = post_response.text().await;
+        let response_json: JsonItemAddlingResponse = serde_json::from_str(&response_text).unwrap();
+
+        let get_item = client
+            .get(&format!("/tables/1/items/{}", response_json.item_id))
+            .send()
+            .await;
+        assert_eq!(get_item.status(), StatusCode::OK);
+
+        let response_text = get_item.text().await;
+        let response_json: JsonItemResponse = serde_json::from_str(&response_text).unwrap();
+        assert_eq!(response_json.name, "Sushi");
+        assert_eq!(response_json.quantity, 10);
 
         let get_items = client.get("/tables/1/items").send().await;
         assert_eq!(get_items.status(), StatusCode::OK);
 
-        let t = get_items.text().await;
-        let response_json: Vec<JsonItemResponse> = serde_json::from_str(&t).unwrap();
+        let response_text = get_items.text().await;
+        let response_json: Vec<JsonItemResponse> = serde_json::from_str(&response_text).unwrap();
         assert_eq!(response_json.len() > 0, true);
-
-        let item_id = response_json[0].id.to_string();
-        let get_item = client.get(&format!("/tables/1/items/{}", item_id)).send().await;
-        assert_eq!(get_item.status(), StatusCode::OK);
     }
 
     #[tokio::test]

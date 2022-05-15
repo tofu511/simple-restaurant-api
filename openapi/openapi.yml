@@ -16,9 +16,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ItemCreationRequest'
+              $ref: '#/components/schemas/ItemAddingRequest'
       responses:
         '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemAddingResponse'
           description: creation succeed
         '400':
           description: invalid request
@@ -85,7 +89,7 @@ paths:
           description: table or item not found
 components:
   schemas:
-    ItemCreationRequest:
+    ItemAddingRequest:
       required:
         - name
         - quantity
@@ -93,6 +97,12 @@ components:
         name:
           type: string
         quantity:
+          type: integer
+    ItemAddingResponse:
+      required:
+        - item_id
+      properties:
+        item_id:
           type: integer
     Items:
       type: array

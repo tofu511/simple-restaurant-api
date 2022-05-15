@@ -71,6 +71,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "app-client"
+version = "0.1.0"
+dependencies = [
+ "api-driver",
+ "reqwest",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "async-trait"
 version = "0.1.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
