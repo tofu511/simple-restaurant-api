@@ -26,8 +26,6 @@ paths:
           description: creation succeed
         '400':
           description: invalid request
-        '404':
-          description: table not found
   /tables/{table_number}/items:
     get:
       description: query all items for a specific table
@@ -45,7 +43,7 @@ paths:
                 $ref: '#/components/schemas/Items'
           description: success
         '404':
-          description: table not found
+          description: item not found
   /tables/{table_number}/items/{item_id}:
     get:
       description: query specific item for a table
@@ -68,7 +66,7 @@ paths:
                 $ref: '#/components/schemas/Item'
           description: query succeed
         '404':
-          description: table number or item id not found
+          description: item not found
     delete:
       description: delete specific item for a table
       parameters:
@@ -85,8 +83,6 @@ paths:
       responses:
         '204':
           description: No content on delete
-        '404':
-          description: table or item not found
 components:
   schemas:
     ItemAddingRequest:
