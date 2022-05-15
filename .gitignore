@@ -1,2 +1,3 @@
 .history
 docker/mysql/data
+**/target/
