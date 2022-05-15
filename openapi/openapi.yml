@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: simple-restaurant-api
+  version: 1.0.0
+paths:
+  /tables/{table_number}/item:
+    post:
+      description: create item for a spefic table
+      parameters:
+        - name: table_number
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCreationRequest'
+      responses:
+        '201':
+          description: creation succeed
+        '400':
+          description: invalid request
+        '404':
+          description: table not found
+  /tables/{table_number}/items:
+    get:
+      description: query all items for a specific table
+      parameters:
+        - name: table_number
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items'
+          description: success
+        '404':
+          description: table not found
+  /tables/{table_number}/items/{item_id}:
+    get:
+      description: query specific item for a table
+      parameters:
+        - name: table_number
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+          description: query succeed
+        '404':
+          description: table number or item id not found
+    delete:
+      description: delete specific item for a table
+      parameters:
+        - name: table_number
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content on delete
+        '404':
+          description: table or item not found
+components:
+  schemas:
+    ItemCreationRequest:
+      required:
+        - name
+        - quantity
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+    Items:
+      type: array
+      items:
+        $ref: "#/components/schemas/Item"
+    Item:
+      type: object
+      required:
+        - name
+        - quantity
+        - remaining_cooking_minutes
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        quantity:
+          type: integer
+        remaining_cooking_minutes:
+          type: integer
+        cooking_started_at:
+          type: string
+    Table_Number:
+      type: integer
