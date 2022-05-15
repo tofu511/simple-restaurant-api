@@ -1,5 +1,13 @@
 # simple-restaurant-api
 - This API is a Rust implementation of Paidy's technical assignment.
+- This API consists of the REST-API application and the client application.
+	- the REST-API application consists of 4 layers of directories.
+		- api-adapter
+		- api-core
+		- api-driver
+		- api-usecase
+	- the client application consists of one directory.
+		- app-client
 - For more information about the assignment, please see [here](https://github.com/paidy/interview/blob/master/SimpleRestaurantApi.md)
 
 ## Requirements
