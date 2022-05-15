@@ -1,0 +1,18 @@
+[package]
+name = "api-adapter"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+api-core = { path = "../api-core" }
+sqlx = { version = "0.5", features = ["runtime-tokio-rustls", "mysql", "chrono"] }
+tokio = { version = "1", features = ["full"] }
+chrono = "0.4.19"
+async-trait = "0.1.53"
+derive-new = "0.5.9"
+
+[dev-dependencies]
+pretty_assertions = "1.2.0"
+serial_test = "0.6.0"
