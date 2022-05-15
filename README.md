@@ -78,7 +78,7 @@ cargo fmt --all
 
 ### Lint
 ```bash
-cargo clippy
+cargo clippy --fix
 ```
 
 ## Architecture
