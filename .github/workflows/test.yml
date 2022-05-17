@@ -14,16 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         profile: minimal
         override: true
-    
+
+    - name: cache dependencies
+      uses: Swatinem/rust-cache@v1
+
     - name: start up docker-compose
       run: docker-compose up -d
-      
+
     - name: Run tests
       run: cargo test --verbose
