@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: install Rust
-      uses: actions-rs/toochain@v1
+      uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         profile: minimal
