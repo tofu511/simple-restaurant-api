@@ -13,16 +13,17 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    # start up mysql to avoid connection error
-    - name: start up docker-compose
-      run: docker-compose up -d
-
     - uses: actions/checkout@v3
     - name: install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         profile: minimal
+
+    # start up mysql to avoid connection error
+    - name: start up docker-compose
+      run: docker-compose up -d
+
     - uses: actions-rs/cargo@v1
       with:
         command: check
