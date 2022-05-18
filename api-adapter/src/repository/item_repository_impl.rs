@@ -22,10 +22,10 @@ impl ItemRepository for ItemRepositoryImpl {
         ).fetch_all(&self.db.pool)
         .await;
 
-        if result.is_err() {
-            Err(Error::ItemNotFoundError)
+        if let Ok(item_rows) = result {
+            Ok(ItemRow::from_rows(item_rows))
         } else {
-            Ok(ItemRow::from_rows(result.unwrap()))
+            Err(Error::ItemNotFoundError)
         }
     }
     async fn find_one(&self, table_number: u32, item_id: u32) -> Result<Item, Error> {
@@ -39,14 +39,14 @@ impl ItemRepository for ItemRepositoryImpl {
       ).fetch_one(&self.db.pool)
       .await;
 
-        if result.is_err() {
-            Err(Error::ItemNotFoundError)
+        if let Ok(item_row) = result {
+            Ok(ItemRow::from_row(item_row))
         } else {
-            Ok(ItemRow::from_row(result.unwrap()))
+            Err(Error::ItemNotFoundError)
         }
     }
     async fn create(&self, table_number: u32, item: Item) -> Result<u64, Error> {
-        let res = sqlx::query!(
+        let result = sqlx::query!(
             r#"
     INSERT INTO items (name, quantity, table_number, start_cooking_at, finish_cooking_at)
     VALUES ( ?, ?, ?, ?, ? )
@@ -60,10 +60,10 @@ impl ItemRepository for ItemRepositoryImpl {
         .execute(&self.db.pool)
         .await;
 
-        if res.is_err() {
-            Err(Error::ItemInsertionError)
+        if let Ok(r) = result {
+            Ok(r.last_insert_id())
         } else {
-            Ok(res.unwrap().last_insert_id())
+            Err(Error::ItemInsertionError)
         }
     }
 
@@ -126,10 +126,7 @@ mod test {
         let db_item_id = repo.create(table_number, item.clone()).await.unwrap();
         let item_id = u32::try_from(db_item_id).unwrap();
 
-        let acutual_data = repo
-            .find_one(table_number, u32::try_from(item_id).unwrap())
-            .await
-            .unwrap();
+        let acutual_data = repo.find_one(table_number, item_id).await.unwrap();
 
         assert_eq!(acutual_data.id.unwrap(), item_id);
         assert_eq!(acutual_data.name, item.name);

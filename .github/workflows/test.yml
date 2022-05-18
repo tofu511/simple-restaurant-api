@@ -1,0 +1,32 @@
+name: Rust
+
+on:
+  push:
+  pull_request:
+    branches:
+    - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: start up docker-compose
+      run: docker-compose up -d
+
+    - name: install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: cache dependencies
+      uses: Swatinem/rust-cache@v1
+
+    - name: Run tests
+      run: cargo test --verbose
