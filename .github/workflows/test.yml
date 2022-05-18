@@ -15,6 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: start up docker-compose
+      run: docker-compose up -d
+
     - name: install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -24,9 +27,6 @@ jobs:
 
     - name: cache dependencies
       uses: Swatinem/rust-cache@v1
-
-    - name: start up docker-compose
-      run: docker-compose up -d
 
     - name: Run tests
       run: cargo test --verbose
